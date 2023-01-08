@@ -1,10 +1,7 @@
-import { 
-  Entity, 
-  Column, 
-  PrimaryGeneratedColumn 
-} from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { ProjectUser } from "../project-users/project-user.entity";
 
-@Entity()
+@Entity('project')
 export class Project {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
@@ -12,6 +9,9 @@ export class Project {
   @Column()
   name!: string;
 
-  @Column()
+  @Column({ type: "uuid" })
   referringEmployeeId!: string;
+
+  @OneToMany(() => ProjectUser, (puser: ProjectUser) => puser.project)
+  public projectUser : ProjectUser[]
 }

@@ -1,61 +1,52 @@
-import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import createUserDto from '../dto/user.dto';
-import loginUserDto from '../dto/login.dto';
-import { User } from '../user.entity';
-import * as  bcrypt from "bcrypt";
-import { isUUID } from 'class-validator';
+import { Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { createUserDto } from "../dto/user.dto";
+import { User } from "../user.entity";
+const bcrypt = require("bcrypt");	
 
 @Injectable()
-export class UsersService {
-  constructor(
-    @InjectRepository(User)
-    private usersRepository: Repository<User>,
-  ) {}
+export class UsersServices {
+	
+	constructor(
+		@InjectRepository(User)
+		private readonly userRepository: Repository<User>
+	) {}
+	
+	createUser(createUserDto: createUserDto): Promise<User> {
+		const salt = bcrypt.genSaltSync(10)
+		const hash = bcrypt.hashSync(createUserDto.password, salt);
+		const user = new User();
+		user.username = createUserDto.username;
+		user.password = hash;
+		user.email = createUserDto.email;
+		user.role = createUserDto.role;
+		return this.userRepository.save(user);
+	}
 
-  findAll(): Promise<User[]> {
-    return this.usersRepository.find();
-  }
+	async findByEmail(email: string): Promise<User | undefined> {
+		return this.userRepository.findOne({ where: { email } });
+	}
 
-  findOneBy(email: string): Promise<User> {
-    return this.usersRepository.findOneBy({ email });
-  }
+	async findById(id: string): Promise<User | undefined> {
+		return this.userRepository.findOne({
+			where: { id },
+			relations: ["projectUser"]
+		});
+	}
 
-  findEmail(email: string): Promise<User> {
-    return this.usersRepository.findOneBy({ email });
+  async findOne(username: string): Promise<User | undefined> {
+    return this.userRepository.findOne({ where: { username }});
   }
+	
+	getUserById(id: string) {
+		return this.userRepository.findOne({
+			where: { id }
+		});
+	}
+	
+	getUsers() {
+		return this.userRepository.find();
+	}
 
-  async getById(id: string): Promise<User> {
-    if(!isUUID(id)) throw new BadRequestException('invalid id')
-    const user = await this.usersRepository.findOneBy({ id });
-    if(!user) {
-      throw new NotFoundException('User not found')
-    }
-    return user;
-  }
-
-  async createUser(user: createUserDto) {
-    const newUser = this.usersRepository.create({
-      ...user, 
-      password:  await bcrypt.hash(user.password, await bcrypt.genSalt(10)),
-    });
-    return this.usersRepository.save(newUser);
-  }
-
-  async remove(id: string): Promise<void> {
-    await this.usersRepository.delete(id);
-  }
-
-  async validate({ email, password }: loginUserDto): Promise<createUserDto> {
-    const user = await this.usersRepository.findOne({ where: { email }});
-    const areEqual = await bcrypt.compare(password, user.password);
-    if(!user) {
-      throw new UnauthorizedException();
-    }
-    if (!areEqual) {
-     throw console.warn("Wrong Password");
-    }
-    return user;
-  }
 }

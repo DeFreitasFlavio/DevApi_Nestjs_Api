@@ -1,7 +1,12 @@
-export default class createProjectUsersDto {
-  readonly id!: string;
-  readonly startDate!: Date;
-  readonly endDate!: Date;
-  readonly projectId!: string;
-  readonly userId!: string;
+import { IsDate, IsUUID } from "class-validator";
+
+export class createProjectUsersDto {
+  @IsDate()
+  startDate!: Date;
+  @IsDate()
+  endDate!: Date;
+  @IsUUID()
+  userId!: string;
+  @IsUUID()
+  projectId!: string;
 }
