@@ -1,18 +1,16 @@
-import { Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import * as dayjs from "dayjs";
-import { Between, Repository } from "typeorm";
-import { EventDto } from "../dto/event.dto";
-import { Event, EventStatus } from "../event.entity";
+/* import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import * as dayjs from 'dayjs';
+import { Between, Repository } from 'typeorm';
 
 @Injectable()
 export class EventServices {
   constructor(
     @InjectRepository(Event)
-    private readonly eventRepository : Repository<Event>
-  ){}
+    private readonly eventRepository: Repository<Event>,
+  ) {}
 
-  async createEvent(eventDto : EventDto, userId : string) {
+  async createEvent(eventDto: EventDto, userId: string) {
     const event = new Event();
     event.date = eventDto.date;
     event.eventDescription = eventDto.eventDescription;
@@ -21,7 +19,7 @@ export class EventServices {
     return await this.eventRepository.save(event);
   }
 
-  async getEventsOfUser(userId : string) {
+  async getEventsOfUser(userId: string) {
     return await this.eventRepository.findBy({ userId });
   }
 
@@ -30,36 +28,41 @@ export class EventServices {
   }
 
   async getAcceptedEvents() {
-    return await this.eventRepository.findBy({ 
+    return await this.eventRepository.findBy({
       eventStatus: EventStatus.ACCEPTED,
     });
   }
 
-  async getEventsInMonth() : Promise<Event[]> {
-    return await this.eventRepository.find({ where: {
+  async getEventsInMonth(): Promise<Event[]> {
+    return await this.eventRepository.find({
+      where: {
         eventStatus: EventStatus.ACCEPTED,
-        date: Between(dayjs().startOf("month").toDate(), dayjs().endOf("month").toDate())
+        date: Between(
+          dayjs().startOf('month').toDate(),
+          dayjs().endOf('month').toDate(),
+        ),
       },
-      relations: ['user', 'user.projectUser', 'user.projectUser.project']
+      relations: ['user', 'user.projectUser', 'user.projectUser.project'],
     });
   }
 
-  async getEventById(id : string) {
+  async getEventById(id: string) {
     return await this.eventRepository.findOne({
       where: { id },
-      relations: ['user', 'user.projectUser', 'user.projectUser.project']
+      relations: ['user', 'user.projectUser', 'user.projectUser.project'],
     });
   }
 
-  async validateEvent(id : string) {
+  async validateEvent(id: string) {
     const event = await this.getEventById(id);
     event.eventStatus = EventStatus.ACCEPTED;
     return await this.eventRepository.save(event);
   }
 
-  async declineEvent(id : string) {
+  async declineEvent(id: string) {
     const event = await this.getEventById(id);
     event.eventStatus = EventStatus.DECLINED;
     return await this.eventRepository.save(event);
   }
 }
+ */
